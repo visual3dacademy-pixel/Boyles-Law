@@ -1,63 +1,252 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boyle's Law Simulation</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="simulation-wrapper">
-        
-        <div class="control-panel">
-            <h2 class="title">BOYLE'S LAW</h2>
-            <p class="formula">$P_1 \times V_1 = P_2 \times V_2$</p>
-            
-            <div class="panel-box">
-                <h3>CONTROL PANEL</h3>
-                <p>As volume decreases, pressure increases. Temperature is constant.</p>
-                
-                <div class="slider-container">
-                    <span>MAX VOLUME</span>
-                    <input type="range" id="volume-slider" min="0.72" max="2.00" step="0.01" value="2.00">
-                    <span>MIN VOLUME</span>
-                </div>
+* {
+    box-sizing: border-box;
+}
 
-                <div class="readouts">
-                    <div class="readout-box">
-                        <span id="volume-text">2.00L</span>
-                        <div class="label blue">VOLUME</div>
-                    </div>
-                    <div class="readout-box">
-                        <span id="pressure-text">100psi</span>
-                        <div class="label light-blue">PRESSURE</div>
-                    </div>
-                </div>
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #ffffff;
+}
 
-                <div class="temp-box">
-                    <div class="label border">TEMPERATURE</div>
-                    <div class="status">Status: <span>LOCKED</span></div>
-                </div>
-            </div>
-        </div>
+.simulation-wrapper {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: white;
+}
 
-        <div class="cylinder-container">
-            <div class="piston-assembly">
-                <div id="piston-shaft"></div>
-                <div id="piston-head"></div>
-            </div>
-            <canvas id="gas-canvas" width="220" height="340"></canvas>
-        </div>
+.control-panel {
+    position: absolute;
+    left: 35px;
+    top: 35px;
+    width: 520px;
+}
 
-        <div class="gauge-container">
-            <div id="gauge-needle"></div>
-        </div>
+.title {
+    margin: 0;
+    font-size: 44px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
 
-        <div class="bottom-math">
-            <span id="math-string">100 psi × 2.00 L = 100 psi × 2.00 L</span>
-        </div>
-    </div>
+.formula {
+    margin: 8px 0 28px;
+    font-size: 28px;
+    font-weight: 800;
+    color: #005a9c;
+    text-align: center;
+}
 
-    <script src="script.js"></script>
-</body>
-</html>
+.panel-box {
+    border: 1px solid #a9c1d5;
+    border-radius: 14px;
+    overflow: hidden;
+    min-height: 720px;
+}
+
+.panel-box h3 {
+    margin: 0;
+    padding: 18px;
+    background: #005a9c;
+    color: white;
+    font-size: 34px;
+    text-align: center;
+}
+
+.panel-box p {
+    margin: 18px 30px;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-align: center;
+}
+
+.slider-container {
+    position: relative;
+    height: 330px;
+    margin-top: 15px;
+}
+
+.slider-container span:first-child {
+    position: absolute;
+    left: 60px;
+    top: 20px;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.slider-container span:last-child {
+    position: absolute;
+    left: 60px;
+    bottom: 5px;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+#volume-slider {
+    position: absolute;
+    left: 245px;
+    top: 15px;
+    width: 300px;
+    transform: rotate(90deg);
+    transform-origin: left center;
+    accent-color: #005a9c;
+}
+
+.readouts {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.readout-box {
+    width: 185px;
+    height: 135px;
+    border: 1px solid #d5dce2;
+    border-radius: 12px;
+    background: #f8f8f8;
+    text-align: center;
+    overflow: hidden;
+}
+
+.readout-box span {
+    display: block;
+    padding: 28px 0;
+    font-size: 34px;
+    font-weight: 900;
+}
+
+.label {
+    padding: 12px;
+    color: white;
+    background: #005a9c;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.temp-box {
+    position: absolute;
+    left: 300px;
+    bottom: 25px;
+    width: 190px;
+    border: 1px solid #a9c1d5;
+    border-radius: 12px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.temp-box .status {
+    padding: 18px 8px;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.temp-box .status span {
+    color: green;
+}
+
+.cylinder-container {
+    position: absolute;
+    left: 680px;
+    top: 45px;
+    width: 420px;
+    height: 840px;
+    border-left: 14px solid rgba(0, 0, 0, 0.25);
+    border-right: 14px solid rgba(0, 0, 0, 0.25);
+    border-radius: 40px;
+    background: rgba(240, 240, 240, 0.35);
+}
+
+.piston-assembly {
+    position: absolute;
+    left: 30px;
+    top: 0;
+    width: 360px;
+    height: 190px;
+    transition: transform 0.08s linear;
+    z-index: 5;
+}
+
+#piston-shaft {
+    position: absolute;
+    left: 160px;
+    top: -110px;
+    width: 40px;
+    height: 300px;
+    background: #222;
+}
+
+#piston-head {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 360px;
+    height: 60px;
+    background: linear-gradient(#555, #111);
+    border-radius: 50%;
+}
+
+#gas-canvas {
+    position: absolute;
+    left: 30px;
+    top: 160px;
+    width: 360px;
+    height: 620px;
+    z-index: 2;
+}
+
+.gauge-container {
+    position: absolute;
+    left: 1210px;
+    top: 330px;
+    width: 320px;
+    height: 320px;
+    border: 12px solid #cfcfcf;
+    border-radius: 50%;
+    background: radial-gradient(circle, white 55%, #eeeeee 70%, #bbbbbb 100%);
+}
+
+.gauge-container::before {
+    content: "100";
+    position: absolute;
+    left: 25px;
+    top: 140px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.gauge-container::after {
+    content: "500";
+    position: absolute;
+    right: 32px;
+    bottom: 75px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+#gauge-needle {
+    position: absolute;
+    left: 72px;
+    top: 148px;
+    width: 115px;
+    height: 10px;
+    background: #263238;
+    border-radius: 10px;
+    transform-origin: 100% 50%;
+    transition: transform 0.08s linear;
+}
+
+.bottom-math {
+    position: absolute;
+    right: 125px;
+    bottom: 55px;
+    width: 470px;
+    padding: 22px;
+    border: 1px solid #d5dce2;
+    border-radius: 12px;
+    background: white;
+    font-size: 25px;
+    font-weight: 900;
+    text-align: center;
+}
