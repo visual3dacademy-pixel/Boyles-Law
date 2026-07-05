@@ -1,63 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boyle's Law Simulation</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="simulation-wrapper">
-        
-        <div class="control-panel">
-            <h2 class="title">BOYLE'S LAW</h2>
-            <p class="formula">$P_1 \times V_1 = P_2 \times V_2$</p>
-            
-            <div class="panel-box">
-                <h3>CONTROL PANEL</h3>
-                <p>As volume decreases, pressure increases. Temperature is constant.</p>
-                
-                <div class="slider-container">
-                    <span>MAX VOLUME</span>
-                    <input type="range" id="volume-slider" min="0.72" max="2.00" step="0.01" value="2.00">
-                    <span>MIN VOLUME</span>
-                </div>
+const slider = document.getElementById("volume-slider");
+const volumeText = document.getElementById("volume-text");
+const pressureText = document.getElementById("pressure-text");
+const mathString = document.getElementById("math-string");
+const pistonAssembly = document.querySelector(".piston-assembly");
+const gaugeNeedle = document.getElementById("gauge-needle");
+const canvas = document.getElementById("gas-canvas");
+const ctx = canvas.getContext("2d");
 
-                <div class="readouts">
-                    <div class="readout-box">
-                        <span id="volume-text">2.00L</span>
-                        <div class="label blue">VOLUME</div>
-                    </div>
-                    <div class="readout-box">
-                        <span id="pressure-text">100psi</span>
-                        <div class="label light-blue">PRESSURE</div>
-                    </div>
-                </div>
+const START_VOLUME = 2.0;
+const START_PRESSURE = 100;
+const MIN_VOLUME = 0.6;
+const MAX_VOLUME = 2.0;
 
-                <div class="temp-box">
-                    <div class="label border">TEMPERATURE</div>
-                    <div class="status">Status: <span>LOCKED</span></div>
-                </div>
-            </div>
-        </div>
+const PISTON_TOP = 35;
+const PISTON_BOTTOM = 210;
 
-        <div class="cylinder-container">
-            <div class="piston-assembly">
-                <div id="piston-shaft"></div>
-                <div id="piston-head"></div>
-            </div>
-            <canvas id="gas-canvas" width="220" height="340"></canvas>
-        </div>
+const NEEDLE_START_ANGLE = -90;
+const NEEDLE_END_ANGLE = 35;
 
-        <div class="gauge-container">
-            <div id="gauge-needle"></div>
-        </div>
+let molecules = [];
 
-        <div class="bottom-math">
-            <span id="math-string">100 psi × 2.00 L = 100 psi × 2.00 L</span>
-        </div>
-    </div>
+for (let i = 0; i < 45; i++) {
+    molecules.push({
+        x: Math.random() * canvas.width,
+        y: 120 + Math.random() * 190,
+        vx: (Math.random() - 0.5) * 2.2,
+        vy: (Math.random() - 0.5) * 2.2,
+        r: 4 + Math.random() * 2
+    });
+}
 
-    <script src="script.js"></script>
-</body>
-</html>
+function getPressure(volume) {
+    return (START_PRESSURE * START_VOLUME) / volume;
+}
+
+function updateSimulation() {
+    const volume = parseFloat(slider.value);
+    const pressure = getPressure(volume);
+
+    const percentCompressed = (MAX_VOLUME - volume) / (MAX_VOLUME - MIN_VOLUME);
+
+    const pistonY = PISTON_TOP + percentCompressed * (PISTON_BOTTOM - PISTON_TOP);
+    const needleAngle = NEEDLE_START_ANGLE + percentCompressed * (NEEDLE_END_ANGLE - NEEDLE_START_ANGLE);
+
+    volumeText.textContent = `${volume.toFixed(2)}L`;
+    pressureText.textContent = `${Math.round(pressure)}psi`;
+
+    mathString.textContent = `100 psi × 2.00 L = ${Math.round(pressure)} psi × ${volume.toFixed(2)} L`;
+
+    pistonAssembly.style.transform = `translateY(${pistonY}px)`;
+    gaugeNeedle.style.transform = `rotate(${needleAngle}deg)`;
+
+    return pistonY;
+}
+
+function drawMolecules() {
+    const pistonY = updateSimulation();
+
+    const gasTop = pistonY + 85;
+    const gasBottom = canvas.height - 20;
+    const gasLeft = 15;
+    const gasRight = canvas.width - 15;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    molecules.forEach(m => {
+        m.x += m.vx;
+        m.y += m.vy;
+
+        if (m.x < gasLeft || m.x > gasRight) m.vx *= -1;
+        if (m.y < gasTop || m.y > gasBottom) m.vy *= -1;
+
+        m.x = Math.max(gasLeft, Math.min(gasRight, m.x));
+        m.y = Math.max(gasTop, Math.min(gasBottom, m.y));
+
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+        ctx.fillStyle = "#2da9df";
+        ctx.fill();
+        ctx.strokeStyle = "#0878a8";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    });
+
+    requestAnimationFrame(drawMolecules);
+}
+
+slider.addEventListener("input", updateSimulation);
+
+updateSimulation();
+drawMolecules();
