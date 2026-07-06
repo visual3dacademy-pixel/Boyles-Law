@@ -1,92 +1,282 @@
-const slider = document.getElementById("volume-slider");
-const volumeText = document.getElementById("volume-text");
-const pressureText = document.getElementById("pressure-text");
-const mathString = document.getElementById("math-string");
-const pistonAssembly = document.querySelector(".piston-assembly");
-const gaugeNeedle = document.getElementById("gauge-needle");
-const canvas = document.getElementById("gas-canvas");
-const ctx = canvas.getContext("2d");
+// =====================================================
+// BOYLE'S LAW INTERACTIVE
+// P1 × V1 = P2 × V2
+// Temperature remains constant.
+// =====================================================
 
-const START_VOLUME = 2.0;
-const START_PRESSURE = 100;
-const MIN_VOLUME = 0.6;
-const MAX_VOLUME = 2.0;
 
-const PISTON_TOP = 35;
-const PISTON_BOTTOM = 210;
+// =====================================================
+// DOM ELEMENTS
+// =====================================================
 
-const NEEDLE_START_ANGLE = -90;
-const NEEDLE_END_ANGLE = 35;
+const slider = document.getElementById("volumeSlider");
+const volumeText = document.getElementById("volumeText");
+const pressureText = document.getElementById("pressureText");
+const mathBox = document.getElementById("mathBox");
+const pistonImage = document.getElementById("pistonImage");
+const gaugeNeedle = document.getElementById("gaugeNeedle");
+const gasCanvas = document.getElementById("gasCanvas");
+const ctx = gasCanvas.getContext("2d");
 
-let molecules = [];
 
-for (let i = 0; i < 45; i++) {
+// =====================================================
+// BOYLE'S LAW SETTINGS
+// =====================================================
+
+const START_VOLUME = 2.0;      // liters
+const MIN_VOLUME = 0.6;        // liters
+const MAX_VOLUME = 2.0;        // liters
+const START_PRESSURE = 100;    // psi
+
+// At 2.00 L, pressure = 100 psi.
+// At 0.60 L, pressure = 333 psi.
+function calculatePressure(volume) {
+  return (START_PRESSURE * START_VOLUME) / volume;
+}
+
+
+// =====================================================
+// MOTION CALIBRATION
+// Adjust these if your images need fine tuning.
+// =====================================================
+
+// Piston vertical movement in pixels.
+const PISTON_MIN_Y = 0;
+const PISTON_MAX_Y = 165;
+
+// Gauge needle rotation.
+// These angles may need calibration based on your needle image.
+const NEEDLE_ANGLE_AT_100_PSI = 180;
+const NEEDLE_ANGLE_AT_500_PSI = 405;
+
+
+// =====================================================
+// GAS CANVAS SETTINGS
+// =====================================================
+
+const GAS_LEFT = 32;
+const GAS_RIGHT = 328;
+const GAS_BOTTOM = 500;
+
+// When max volume, the gas area is taller.
+// When min volume, the top of the gas area moves downward.
+const GAS_TOP_MAX_VOLUME = 90;
+const GAS_TOP_MIN_VOLUME = 255;
+
+const molecules = [];
+const MOLECULE_COUNT = 52;
+
+function createMolecules() {
+  molecules.length = 0;
+
+  for (let i = 0; i < MOLECULE_COUNT; i++) {
     molecules.push({
-        x: Math.random() * canvas.width,
-        y: 120 + Math.random() * 190,
-        vx: (Math.random() - 0.5) * 2.2,
-        vy: (Math.random() - 0.5) * 2.2,
-        r: 4 + Math.random() * 2
+      x: GAS_LEFT + Math.random() * (GAS_RIGHT - GAS_LEFT),
+      y: GAS_TOP_MAX_VOLUME + Math.random() * (GAS_BOTTOM - GAS_TOP_MAX_VOLUME),
+      vx: (Math.random() < 0.5 ? -1 : 1) * (0.85 + Math.random() * 0.9),
+      vy: (Math.random() < 0.5 ? -1 : 1) * (0.85 + Math.random() * 0.9),
+      r: 4 + Math.random() * 2
     });
+  }
 }
 
-function getPressure(volume) {
-    return (START_PRESSURE * START_VOLUME) / volume;
+createMolecules();
+
+
+// =====================================================
+// FORMATTERS
+// =====================================================
+
+function formatVolume(volume) {
+  return `${volume.toFixed(2)}L`;
 }
+
+function formatPressure(pressure) {
+  return `${Math.round(pressure)}psi`;
+}
+
+
+// =====================================================
+// NORMALIZE SLIDER
+// 0 = max volume
+// 1 = min volume
+// =====================================================
+
+function getCompressionPercent(volume) {
+  return (MAX_VOLUME - volume) / (MAX_VOLUME - MIN_VOLUME);
+}
+
+
+// =====================================================
+// UPDATE VISUALS
+// =====================================================
 
 function updateSimulation() {
-    const volume = parseFloat(slider.value);
-    const pressure = getPressure(volume);
+  const volume = Number(slider.value);
+  const pressure = calculatePressure(volume);
+  const compression = getCompressionPercent(volume);
 
-    const percentCompressed = (MAX_VOLUME - volume) / (MAX_VOLUME - MIN_VOLUME);
+  // -----------------------------
+  // Text readouts
+  // -----------------------------
+  volumeText.textContent = formatVolume(volume);
+  pressureText.textContent = formatPressure(pressure);
 
-    const pistonY = PISTON_TOP + percentCompressed * (PISTON_BOTTOM - PISTON_TOP);
-    const needleAngle = NEEDLE_START_ANGLE + percentCompressed * (NEEDLE_END_ANGLE - NEEDLE_START_ANGLE);
+  mathBox.textContent =
+    `100 psi × 2.00 L = ${Math.round(pressure)} psi × ${volume.toFixed(2)} L`;
 
-    volumeText.textContent = `${volume.toFixed(2)}L`;
-    pressureText.textContent = `${Math.round(pressure)}psi`;
+  // -----------------------------
+  // Piston movement
+  // -----------------------------
+  const pistonY =
+    PISTON_MIN_Y + compression * (PISTON_MAX_Y - PISTON_MIN_Y);
 
-    mathString.textContent = `100 psi × 2.00 L = ${Math.round(pressure)} psi × ${volume.toFixed(2)} L`;
+  pistonImage.style.transform = `translateY(${pistonY}px)`;
 
-    pistonAssembly.style.transform = `translateY(${pistonY}px)`;
-    gaugeNeedle.style.transform = `rotate(${needleAngle}deg)`;
+  // -----------------------------
+  // Gauge needle movement
+  // -----------------------------
+  const clampedPressure = Math.max(100, Math.min(500, pressure));
+  const pressurePercent = (clampedPressure - 100) / 400;
 
-    return pistonY;
+  const needleAngle =
+    NEEDLE_ANGLE_AT_100_PSI +
+    pressurePercent * (NEEDLE_ANGLE_AT_500_PSI - NEEDLE_ANGLE_AT_100_PSI);
+
+  gaugeNeedle.style.transform = `rotate(${needleAngle}deg)`;
+
+  // -----------------------------
+  // Gas boundary
+  // -----------------------------
+  const gasTop =
+    GAS_TOP_MAX_VOLUME +
+    compression * (GAS_TOP_MIN_VOLUME - GAS_TOP_MAX_VOLUME);
+
+  return {
+    volume,
+    pressure,
+    compression,
+    gasTop
+  };
 }
 
-function drawMolecules() {
-    const pistonY = updateSimulation();
 
-    const gasTop = pistonY + 85;
-    const gasBottom = canvas.height - 20;
-    const gasLeft = 15;
-    const gasRight = canvas.width - 15;
+// =====================================================
+// DRAW MOLECULES
+// =====================================================
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+function drawGas() {
+  const state = updateSimulation();
 
-    molecules.forEach(m => {
-        m.x += m.vx;
-        m.y += m.vy;
+  ctx.clearRect(0, 0, gasCanvas.width, gasCanvas.height);
 
-        if (m.x < gasLeft || m.x > gasRight) m.vx *= -1;
-        if (m.y < gasTop || m.y > gasBottom) m.vy *= -1;
+  // Clip the molecules inside the gas chamber.
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(
+    GAS_LEFT,
+    state.gasTop,
+    GAS_RIGHT - GAS_LEFT,
+    GAS_BOTTOM - state.gasTop
+  );
+  ctx.clip();
 
-        m.x = Math.max(gasLeft, Math.min(gasRight, m.x));
-        m.y = Math.max(gasTop, Math.min(gasBottom, m.y));
+  // Slight gas fill.
+  const gasGradient = ctx.createLinearGradient(0, state.gasTop, 0, GAS_BOTTOM);
+  gasGradient.addColorStop(0, "rgba(255, 255, 255, 0.05)");
+  gasGradient.addColorStop(1, "rgba(190, 220, 240, 0.14)");
 
-        ctx.beginPath();
-        ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
-        ctx.fillStyle = "#2da9df";
-        ctx.fill();
-        ctx.strokeStyle = "#0878a8";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-    });
+  ctx.fillStyle = gasGradient;
+  ctx.fillRect(
+    GAS_LEFT,
+    state.gasTop,
+    GAS_RIGHT - GAS_LEFT,
+    GAS_BOTTOM - state.gasTop
+  );
 
-    requestAnimationFrame(drawMolecules);
+  // Molecules move faster as pressure increases.
+  const speedBoost = 1 + state.compression * 0.65;
+
+  for (const molecule of molecules) {
+    molecule.x += molecule.vx * speedBoost;
+    molecule.y += molecule.vy * speedBoost;
+
+    if (molecule.x - molecule.r < GAS_LEFT) {
+      molecule.x = GAS_LEFT + molecule.r;
+      molecule.vx *= -1;
+    }
+
+    if (molecule.x + molecule.r > GAS_RIGHT) {
+      molecule.x = GAS_RIGHT - molecule.r;
+      molecule.vx *= -1;
+    }
+
+    if (molecule.y - molecule.r < state.gasTop) {
+      molecule.y = state.gasTop + molecule.r;
+      molecule.vy *= -1;
+    }
+
+    if (molecule.y + molecule.r > GAS_BOTTOM) {
+      molecule.y = GAS_BOTTOM - molecule.r;
+      molecule.vy *= -1;
+    }
+
+    ctx.beginPath();
+    ctx.arc(molecule.x, molecule.y, molecule.r, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(44, 166, 213, 0.88)";
+    ctx.fill();
+
+    ctx.lineWidth = 1.25;
+    ctx.strokeStyle = "rgba(8, 113, 153, 0.95)";
+    ctx.stroke();
+
+    // Highlight
+    ctx.beginPath();
+    ctx.arc(
+      molecule.x - molecule.r * 0.35,
+      molecule.y - molecule.r * 0.35,
+      molecule.r * 0.28,
+      0,
+      Math.PI * 2
+    );
+    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+    ctx.fill();
+  }
+
+  ctx.restore();
+
+  requestAnimationFrame(drawGas);
 }
+
+
+// =====================================================
+// RESPONSIVE STAGE SCALING
+// =====================================================
+
+function scaleStageToWindow() {
+  const stage = document.getElementById("stage");
+
+  const baseWidth = 1600;
+  const baseHeight = 900;
+
+  const scale = Math.min(
+    window.innerWidth / baseWidth,
+    window.innerHeight / baseHeight
+  );
+
+  stage.style.transform = `scale(${scale})`;
+  stage.style.width = `${baseWidth}px`;
+  stage.style.height = `${baseHeight}px`;
+}
+
+
+// =====================================================
+// INIT
+// =====================================================
 
 slider.addEventListener("input", updateSimulation);
+window.addEventListener("resize", scaleStageToWindow);
 
+scaleStageToWindow();
 updateSimulation();
-drawMolecules();
+drawGas();
