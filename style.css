@@ -1,252 +1,374 @@
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
+html,
 body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #ffffff;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
 }
 
-.simulation-wrapper {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    background: white;
+#app {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #ffffff;
 }
+
+/* 
+  Stage is designed as 1600 x 900.
+  Storyline can use this as a 16:9 web object.
+*/
+#stage {
+  position: relative;
+  width: 1600px;
+  height: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* ============================= */
+/* LEFT CONTROL PANEL */
+/* ============================= */
 
 .control-panel {
-    position: absolute;
-    left: 35px;
-    top: 35px;
-    width: 520px;
+  position: absolute;
+  left: 35px;
+  top: 28px;
+  width: 520px;
+  height: 835px;
 }
 
-.title {
-    margin: 0;
-    font-size: 44px;
-    font-weight: 900;
-    letter-spacing: 1px;
+.control-panel h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 42px;
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #000000;
 }
 
 .formula {
-    margin: 8px 0 28px;
-    font-size: 28px;
-    font-weight: 800;
-    color: #005a9c;
-    text-align: center;
+  margin-top: 10px;
+  margin-bottom: 24px;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 900;
+  color: #075a93;
 }
 
 .panel-box {
-    border: 1px solid #a9c1d5;
-    border-radius: 14px;
-    overflow: hidden;
-    min-height: 720px;
+  width: 100%;
+  height: 735px;
+  border: 1px solid #9ebbd2;
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+  background: #ffffff;
 }
 
-.panel-box h3 {
-    margin: 0;
-    padding: 18px;
-    background: #005a9c;
-    color: white;
-    font-size: 34px;
-    text-align: center;
+.panel-title {
+  height: 64px;
+  display: grid;
+  place-items: center;
+  background: #075a93;
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 900;
 }
 
-.panel-box p {
-    margin: 18px 30px;
-    font-size: 26px;
-    font-weight: 700;
-    line-height: 1.3;
-    text-align: center;
+.instruction {
+  height: 137px;
+  display: grid;
+  place-items: center;
+  padding: 0 28px;
+  border-bottom: 2px solid #b5c9da;
+  text-align: center;
+  font-size: 27px;
+  line-height: 1.28;
+  font-weight: 900;
+  color: #000000;
 }
 
-.slider-container {
-    position: relative;
-    height: 330px;
-    margin-top: 15px;
+.slider-area {
+  position: relative;
+  height: 534px;
 }
 
-.slider-container span:first-child {
-    position: absolute;
-    left: 60px;
-    top: 20px;
-    font-size: 22px;
-    font-weight: 800;
+.slider-label {
+  position: absolute;
+  left: 58px;
+  font-size: 24px;
+  font-weight: 900;
+  color: #000000;
 }
 
-.slider-container span:last-child {
-    position: absolute;
-    left: 60px;
-    bottom: 5px;
-    font-size: 22px;
-    font-weight: 800;
+.slider-label.top {
+  top: 47px;
 }
 
-#volume-slider {
-    position: absolute;
-    left: 245px;
-    top: 15px;
-    width: 300px;
-    transform: rotate(90deg);
-    transform-origin: left center;
-    accent-color: #005a9c;
+.slider-label.bottom {
+  bottom: 29px;
 }
 
-.readouts {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
+.slider-track {
+  position: absolute;
+  left: 249px;
+  top: 37px;
+  width: 22px;
+  height: 490px;
+  border-radius: 999px;
+  background: #d9e6f0;
 }
 
-.readout-box {
-    width: 185px;
-    height: 135px;
-    border: 1px solid #d5dce2;
-    border-radius: 12px;
-    background: #f8f8f8;
-    text-align: center;
-    overflow: hidden;
+#volumeSlider {
+  position: absolute;
+  left: 6px;
+  top: 274px;
+  width: 505px;
+  height: 30px;
+  transform: rotate(-90deg);
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  outline: none;
+  z-index: 10;
+  cursor: pointer;
 }
 
-.readout-box span {
-    display: block;
-    padding: 28px 0;
-    font-size: 34px;
-    font-weight: 900;
+#volumeSlider::-webkit-slider-runnable-track {
+  height: 22px;
+  background: transparent;
 }
 
-.label {
-    padding: 12px;
-    color: white;
-    background: #005a9c;
-    font-size: 18px;
-    font-weight: 800;
+#volumeSlider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 62px;
+  height: 62px;
+  margin-top: -20px;
+  border-radius: 50%;
+  border: 2px solid #004a7c;
+  background: #075a93;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
-.temp-box {
-    position: absolute;
-    left: 300px;
-    bottom: 25px;
-    width: 190px;
-    border: 1px solid #a9c1d5;
-    border-radius: 12px;
-    overflow: hidden;
-    text-align: center;
+#volumeSlider::-moz-range-track {
+  height: 22px;
+  background: transparent;
 }
 
-.temp-box .status {
-    padding: 18px 8px;
-    font-size: 20px;
-    font-weight: 800;
+#volumeSlider::-moz-range-thumb {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 2px solid #004a7c;
+  background: #075a93;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
-.temp-box .status span {
-    color: green;
+.readout {
+  position: absolute;
+  top: 182px;
+  width: 184px;
+  height: 134px;
+  border: 1px solid #d6dde4;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f7f7f7;
+  text-align: center;
 }
 
-.cylinder-container {
-    position: absolute;
-    left: 680px;
-    top: 45px;
-    width: 420px;
-    height: 840px;
-    border-left: 14px solid rgba(0, 0, 0, 0.25);
-    border-right: 14px solid rgba(0, 0, 0, 0.25);
-    border-radius: 40px;
-    background: rgba(240, 240, 240, 0.35);
+.volume-readout {
+  left: 34px;
 }
 
-.piston-assembly {
-    position: absolute;
-    left: 30px;
-    top: 0;
-    width: 360px;
-    height: 190px;
-    transition: transform 0.08s linear;
-    z-index: 5;
+.pressure-readout {
+  right: 32px;
 }
 
-#piston-shaft {
-    position: absolute;
-    left: 160px;
-    top: -110px;
-    width: 40px;
-    height: 300px;
-    background: #222;
+.readout-value {
+  height: 90px;
+  display: grid;
+  place-items: center;
+  font-size: 35px;
+  font-weight: 900;
+  color: #000000;
 }
 
-#piston-head {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 360px;
-    height: 60px;
-    background: linear-gradient(#555, #111);
-    border-radius: 50%;
+.readout-label {
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: #075a93;
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 900;
 }
 
-#gas-canvas {
-    position: absolute;
-    left: 30px;
-    top: 160px;
-    width: 360px;
-    height: 620px;
-    z-index: 2;
+.temperature-box {
+  position: absolute;
+  right: 20px;
+  bottom: 18px;
+  width: 196px;
+  height: 102px;
+  border: 1px solid #b3c9dc;
+  border-radius: 12px;
+  overflow: hidden;
+  text-align: center;
+  background: #ffffff;
 }
 
-.gauge-container {
-    position: absolute;
-    left: 1210px;
-    top: 330px;
-    width: 320px;
-    height: 320px;
-    border: 12px solid #cfcfcf;
-    border-radius: 50%;
-    background: radial-gradient(circle, white 55%, #eeeeee 70%, #bbbbbb 100%);
+.temperature-label {
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: #075a93;
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 900;
 }
 
-.gauge-container::before {
-    content: "100";
-    position: absolute;
-    left: 25px;
-    top: 140px;
-    font-size: 24px;
-    font-weight: 700;
+.temperature-status {
+  height: 62px;
+  display: grid;
+  place-items: center;
+  font-size: 21px;
+  font-weight: 900;
+  color: #000000;
 }
 
-.gauge-container::after {
-    content: "500";
-    position: absolute;
-    right: 32px;
-    bottom: 75px;
-    font-size: 24px;
-    font-weight: 700;
+.temperature-status span {
+  color: #07802d;
 }
 
-#gauge-needle {
-    position: absolute;
-    left: 72px;
-    top: 148px;
-    width: 115px;
-    height: 10px;
-    background: #263238;
-    border-radius: 10px;
-    transform-origin: 100% 50%;
-    transition: transform 0.08s linear;
+/* ============================= */
+/* CYLINDER OBJECTS */
+/* ============================= */
+
+.cylinder-area {
+  position: absolute;
+  left: 625px;
+  top: 60px;
+  width: 455px;
+  height: 810px;
 }
 
-.bottom-math {
-    position: absolute;
-    right: 125px;
-    bottom: 55px;
-    width: 470px;
-    padding: 22px;
-    border: 1px solid #d5dce2;
-    border-radius: 12px;
-    background: white;
-    font-size: 25px;
-    font-weight: 900;
-    text-align: center;
+#containerImage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 455px;
+  height: 810px;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#gasCanvas {
+  position: absolute;
+  left: 48px;
+  top: 255px;
+  width: 360px;
+  height: 520px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+#pistonImage {
+  position: absolute;
+  left: 42px;
+  top: 115px;
+  width: 370px;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  z-index: 5;
+  transform: translateY(0px);
+  transition: transform 0.08s linear;
+}
+
+/* ============================= */
+/* GAUGE OBJECTS */
+/* ============================= */
+
+.gauge-area {
+  position: absolute;
+  left: 1165px;
+  top: 300px;
+  width: 350px;
+  height: 350px;
+}
+
+#gaugeFace {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 350px;
+  height: 350px;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#gaugeNeedle {
+  position: absolute;
+
+  /*
+    These numbers place the needle over the gauge.
+    If your needle image does not pivot correctly,
+    adjust left/top/width and transform-origin here.
+  */
+  left: 165px;
+  top: 165px;
+  width: 135px;
+  height: auto;
+
+  transform-origin: 0% 50%;
+  transform: rotate(180deg);
+
+  user-select: none;
+  pointer-events: none;
+  z-index: 5;
+
+  transition: transform 0.08s linear;
+}
+
+/* ============================= */
+/* MATH BOX */
+/* ============================= */
+
+#mathBox {
+  position: absolute;
+  left: 1108px;
+  bottom: 35px;
+  width: 475px;
+  height: 86px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d8dfe6;
+  border-radius: 12px;
+  background: #ffffff;
+  font-size: 27px;
+  font-weight: 900;
+  text-align: center;
+  color: #000000;
+}
+
+/* ============================= */
+/* RESPONSIVE SCALE */
+/* ============================= */
+
+@media (max-width: 1600px), (max-height: 900px) {
+  #stage {
+    transform-origin: top left;
+  }
 }
