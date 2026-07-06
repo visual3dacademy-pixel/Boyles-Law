@@ -1,11 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Boyle's Law Test</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Boyle's Law Interactive</title>
+
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <h1>Boyle's Law GitHub Pages Test</h1>
-  <p>If you can see this, the publishing pipeline works.</p>
+  <main id="app">
+    <section id="stage">
+
+      <!-- LEFT CONTROL PANEL -->
+      <section class="control-panel">
+        <h1>BOYLE'S LAW</h1>
+        <div class="formula">P₁ × V₁ = P₂ × V₂</div>
+
+        <div class="panel-box">
+          <div class="panel-title">CONTROL PANEL</div>
+
+          <div class="instruction">
+            As volume decreases,<br />
+            pressure increases.<br />
+            Temperature is constant
+          </div>
+
+          <div class="slider-area">
+            <div class="slider-label top">MAX VOLUME</div>
+            <div class="slider-label bottom">MIN VOLUME</div>
+
+            <div class="slider-track"></div>
+
+            <input
+              id="volumeSlider"
+              type="range"
+              min="0.60"
+              max="2.00"
+              step="0.01"
+              value="2.00"
+              aria-label="Volume slider"
+            />
+
+            <div class="readout volume-readout">
+              <div id="volumeText" class="readout-value">2.00L</div>
+              <div class="readout-label">VOLUME</div>
+            </div>
+
+            <div class="readout pressure-readout">
+              <div id="pressureText" class="readout-value">100psi</div>
+              <div class="readout-label">PRESSURE</div>
+            </div>
+
+            <div class="temperature-box">
+              <div class="temperature-label">TEMPERATURE</div>
+              <div class="temperature-status">Status: <span>LOCKED</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CYLINDER / PISTON AREA -->
+      <section class="cylinder-area">
+        <img
+          id="containerImage"
+          src="images/container.png"
+          alt=""
+          draggable="false"
+        />
+
+        <canvas id="gasCanvas" width="360" height="520"></canvas>
+
+        <img
+          id="pistonImage"
+          src="images/piston.png"
+          alt=""
+          draggable="false"
+        />
+      </section>
+
+      <!-- GAUGE AREA -->
+      <section class="gauge-area">
+        <img
+          id="gaugeFace"
+          src="images/pressure%20no%20needle.png"
+          alt=""
+          draggable="false"
+        />
+
+        <img
+          id="gaugeNeedle"
+          src="images/needle1.png"
+          alt=""
+          draggable="false"
+        />
+      </section>
+
+      <!-- MATH BOX -->
+      <div id="mathBox">
+        100 psi × 2.00 L = 100 psi × 2.00 L
+      </div>
+
+    </section>
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
